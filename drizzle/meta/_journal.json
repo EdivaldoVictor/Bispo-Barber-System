@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1765928409654,
+      "tag": "0000_numerous_bruce_banner",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1765928981104,
+      "tag": "0001_powerful_agent_zero",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1765929477690,
+      "tag": "0002_steady_thaddeus_ross",
+      "breakpoints": true
+    }
+  ]
+}
