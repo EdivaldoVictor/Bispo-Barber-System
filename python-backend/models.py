@@ -66,7 +66,7 @@ class ServiceInfo(BaseModel):
     """Information about a service"""
     id: str = Field(..., description="Service ID")
     name: str = Field(..., description="Service name")
-    price: float = Field(..., description="Service price in USD")
+    price: float = Field(..., description="Service price in BRL")
     duration: int = Field(..., description="Service duration in minutes")
     description: str = Field(..., description="Service description")
 

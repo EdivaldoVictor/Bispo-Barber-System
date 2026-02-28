@@ -64,9 +64,8 @@ class BarbershopAIAssistant:
         
         response = self.llm.invoke(messages)
         
-        # ⚠️ SEMPRE usar response.content
+        # ⚠️ Always use response.content to get the text
         assistant_text = response.content
-
 
         # Add AI response to history
         self.add_message("assistant", assistant_text)

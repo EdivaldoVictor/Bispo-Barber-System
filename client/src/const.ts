@@ -14,7 +14,13 @@ export const getLoginUrl = () => {
   }
 
   const redirectUri = `${window.location.origin}/api/oauth/callback`;
-  const state = btoa(redirectUri);
+  let state = "";
+  try {
+    state = btoa(redirectUri);
+  } catch (e) {
+    console.error("Error encoding state:", e);
+    state = "error";
+  }
 
   const url = new URL("/app-auth", oauthPortalUrl);
   url.searchParams.set("appId", appId);

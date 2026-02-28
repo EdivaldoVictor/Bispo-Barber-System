@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface Message {
   id: number;
@@ -49,6 +50,7 @@ export function ChatBox({ conversationId, onAppointmentDetected }: ChatBoxProps)
     setIsLoading(true);
 
     try {
+      console.log("Sending message to conversation:", conversationId);
       await sendMessageMutation.mutateAsync({
         conversationId,
         content: userMessage,
@@ -72,8 +74,14 @@ export function ChatBox({ conversationId, onAppointmentDetected }: ChatBoxProps)
         createdAt: new Date(),
       };
       setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending message:", error);
+      // Check for specific error codes or messages
+      if (error.message?.includes("44") || error.data?.code === 44) {
+        toast.error("Erro 44: Problema na comunicação com o assistente.");
+      } else {
+        toast.error("Erro ao enviar mensagem. Tente novamente.");
+      }
     } finally {
       setIsLoading(false);
     }

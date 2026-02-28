@@ -42,7 +42,7 @@ When you have extracted enough information to create an appointment, respond wit
 ```json
 {
   "appointment_ready": true,
-  "service": "haircut|hair_eyebrow|full_service",
+  "service": "haircut|hair_eyebrow|full_service|hair_beard|beard_only",
   "date": "YYYY-MM-DD",
   "time": "HH:MM",
   "barber_name": "name or null",
@@ -57,31 +57,31 @@ SERVICES = {
     "haircut": {
         "name": "Corte de Cabelo",
         "price": 25.00,
-        "duration": 30,
+        "duration": 20,
         "description": "Professional haircut"
     },
     "hair_eyebrow": {
         "name": "Cabelo e Sobrancelha",
         "price": 30.00,
-        "duration": 45,
+        "duration": 25,
         "description": "Haircut with eyebrow trim"
     },
     "full_service": {
         "name": "Serviço Completo",
         "price": 40.00,
-        "duration": 60,
+        "duration": 45,
         "description": "Haircut, eyebrow trim, and beard trim"
     },
     "hair_beard": {
         "name": "Cabelo e Barba",
         "price": 35.00,
-        "duration": 50,
+        "duration": 30,
         "description": "Haircut with beard trim"
     },
     "beard_only": {
         "name": "Somente Barba",
         "price": 20.00,
-        "duration": 20,
+        "duration": 15,
         "description": "Beard trim only"
     }
 }

@@ -6,18 +6,18 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createConversation, getConversationsByUserId, getMessagesByConversationId, addMessage, getAppointmentsByUserId, getAllAppointments, createAppointment, updateAppointment, getTrainingExamples, createTrainingExample, updateTrainingExample } from "./db";
 import { stripeRouter } from "./stripe-router";
+import { aiRouter } from "./ai-router";
+
 
 export const appRouter = router({
-    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
+
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
-      return {
-        success: true,
-      } as const;
+      return { success: true } as const;
     }),
   }),
 
@@ -29,9 +29,11 @@ export const appRouter = router({
     getConversations: protectedProcedure.query(async ({ ctx }) => {
       return getConversationsByUserId(ctx.user.id);
     }),
-    getMessages: protectedProcedure.input(z.object({ conversationId: z.number() })).query(async ({ input }) => {
-      return getMessagesByConversationId(input.conversationId);
-    }),
+    getMessages: protectedProcedure
+      .input(z.object({ conversationId: z.number() }))
+      .query(async ({ input }) => {
+        return getMessagesByConversationId(input.conversationId);
+      }),
     sendMessage: protectedProcedure
       .input(z.object({ conversationId: z.number(), content: z.string() }))
       .mutation(async ({ input }) => {
@@ -39,16 +41,22 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  /** ✅ NOVO ROUTER DE IA */
+  ai: aiRouter,
+
   appointments: router({
     list: protectedProcedure.query(async ({ ctx }) => {
       return getAppointmentsByUserId(ctx.user.id);
     }),
-    listAll: protectedProcedure.use(async ({ ctx, next }) => {
-      if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
-      return next({ ctx });
-    }).query(async () => {
-      return getAllAppointments();
-    }),
+    listAll: protectedProcedure
+      .use(async ({ ctx, next }) => {
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+        return next({ ctx });
+      })
+      .query(async () => {
+        return getAllAppointments();
+      }),
     create: protectedProcedure
       .input(z.object({
         service: z.string(),
@@ -82,18 +90,23 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
   stripe: stripeRouter,
+
   training: router({
-    getExamples: protectedProcedure.use(async ({ ctx, next }) => {
-      if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
-      return next({ ctx });
-    }).query(async () => {
-      return getTrainingExamples();
-    }),
-    createExample: protectedProcedure.use(async ({ ctx, next }) => {
-      if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
-      return next({ ctx });
-    })
+    getExamples: protectedProcedure
+      .use(async ({ ctx, next }) => {
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+        return next({ ctx });
+      })
+      .query(async () => {
+        return getTrainingExamples();
+      }),
+    createExample: protectedProcedure
+      .use(async ({ ctx, next }) => {
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+        return next({ ctx });
+      })
       .input(z.object({
         userMessage: z.string(),
         assistantResponse: z.string(),
@@ -110,10 +123,11 @@ export const appRouter = router({
         });
         return { exampleId: result.insertId };
       }),
-    updateExample: protectedProcedure.use(async ({ ctx, next }) => {
-      if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
-      return next({ ctx });
-    })
+    updateExample: protectedProcedure
+      .use(async ({ ctx, next }) => {
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+        return next({ ctx });
+      })
       .input(z.object({
         exampleId: z.number(),
         quality: z.enum(["excellent", "good", "acceptable", "poor"]).optional(),
@@ -128,5 +142,6 @@ export const appRouter = router({
       }),
   }),
 });
+
 
 export type AppRouter = typeof appRouter;
